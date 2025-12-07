@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Tuple
 
 import mlflow
 import mlflow.tensorflow
