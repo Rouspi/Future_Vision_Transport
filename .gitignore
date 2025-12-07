@@ -1,0 +1,11 @@
+data/
+artifacts/
+mlruns/
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+.DS_Store
+presentation_outline.md
+mlflow.db
+Dockerfile
+
