@@ -8,4 +8,4 @@ __pycache__/
 presentation_outline.md
 mlflow.db
 Dockerfile
-
+artifacts_weihted_too_long/
