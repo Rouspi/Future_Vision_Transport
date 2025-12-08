@@ -4,6 +4,8 @@ from typing import Dict, Tuple
 
 import mlflow
 import mlflow.tensorflow
+from mlflow.models import ModelSignature
+from mlflow.types.schema import Schema, TensorSpec
 import tensorflow as tf
 import keras
 import numpy as np
@@ -280,11 +282,16 @@ def train_segmentation_model(config: TrainingConfig, settings: Settings) -> tf.k
 
         artifact_dir = settings.project_root / config.model_output_dir
         _save_artifacts(model, artifact_dir)
+        signature = ModelSignature(
+            inputs=Schema([TensorSpec(np.dtype("float32"), (-1,) + config.input_shape())]),
+            outputs=Schema([TensorSpec(np.dtype("float32"), (-1, config.input_height, config.input_width, config.num_classes))]),
+        )
+        example = np.zeros((1,) + config.input_shape(), dtype=np.float32)
         mlflow.keras.log_model(
             model,
             artifact_path="model",
-            signature=None,
-            input_example=None,
+            signature=signature,
+            input_example=example,
             pip_requirements=[
                 f"tensorflow=={tf.__version__}",
                 f"keras=={keras.__version__}",
