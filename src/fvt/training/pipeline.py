@@ -103,10 +103,6 @@ def _build_vgg16_unet(config: TrainingConfig) -> tf.keras.Model:
     x = tf.keras.layers.Conv2D(64, 3, activation="relu", padding="same")(x)
     x = tf.keras.layers.Conv2D(64, 3, activation="relu", padding="same")(x)
 
-    x = tf.keras.layers.UpSampling2D((2, 2))(x)
-    x = tf.keras.layers.Conv2D(64, 3, activation="relu", padding="same")(x)
-    x = tf.keras.layers.Conv2D(64, 3, activation="relu", padding="same")(x)
-
     outputs = tf.keras.layers.Conv2D(config.num_classes, 1, activation="softmax")(x)
     model = tf.keras.Model(inputs=inputs, outputs=outputs, name="vgg16_unet")
     return model
