@@ -259,6 +259,7 @@ def train_segmentation_model(config: TrainingConfig, settings: Settings) -> tf.k
     model = build_model(config)
 
     with mlflow.start_run(run_name=config.run_name):
+        print("Starting MLflow run:", config.run_name, "URI:", mlflow.get_tracking_uri())
         _log_static_metadata(config)
         history = model.fit(
             train_ds,
