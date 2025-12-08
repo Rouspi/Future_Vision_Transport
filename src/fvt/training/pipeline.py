@@ -6,7 +6,7 @@ import mlflow
 import mlflow.tensorflow
 import tensorflow as tf
 import keras
-import keras
+import numpy as np
 
 from fvt.config import Settings, ensure_directories
 from fvt.data.dataset_builder import build_dataset
@@ -280,11 +280,16 @@ def train_segmentation_model(config: TrainingConfig, settings: Settings) -> tf.k
 
         artifact_dir = settings.project_root / config.model_output_dir
         _save_artifacts(model, artifact_dir)
+        example = np.zeros((1,) + config.input_shape(), dtype=np.float32)
+        preds = model.predict(example, verbose=0)
+        if hasattr(preds, "numpy"):
+            preds = preds.numpy()
+        signature = mlflow.models.infer_signature(example, preds)
         mlflow.keras.log_model(
             model,
             artifact_path="model",
-            signature=None,
-            input_example=None,
+            signature=signature,
+            input_example=example,
             pip_requirements=[
                 f"tensorflow=={tf.__version__}",
                 f"keras=={keras.__version__}",
