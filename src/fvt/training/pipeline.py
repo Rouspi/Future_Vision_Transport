@@ -185,7 +185,7 @@ def _save_artifacts(model: tf.keras.Model, artifact_dir: Path) -> Dict[str, str]
     artifact_dir.mkdir(parents=True, exist_ok=True)
     # Keras 3 impose une extension explicite : on sauvegarde au format natif .keras
     saved_model_path = artifact_dir / "model.keras"
-    model.save(saved_model_path, include_optimizer=False)
+    model.save(saved_model_path)
 
     classes_path = artifact_dir / "classes.json"
     palette_path = artifact_dir / "palette.json"
@@ -282,8 +282,6 @@ def train_segmentation_model(config: TrainingConfig, settings: Settings) -> tf.k
         mlflow.keras.log_model(
             model,
             artifact_path="model",
-            # Use a NumPy example to satisfy MLflow input_example type expectations.
-            input_example=tf.zeros((1,) + config.input_shape()).numpy(),
             signature=None,
         )
 
