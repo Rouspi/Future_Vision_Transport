@@ -1,0 +1,19 @@
+# Preset UNet small, demi-Cityscapes (512x1024) pour limiter la VRAM tout en gardant du détail spatial.
+run_name = "unet_small_dice_fullres"
+model_type = "unet_small"
+input_height = 512
+input_width  = 1024
+batch_size = 2
+epochs = 30
+learning_rate = 0.0002
+loss_type = "ce_dice"
+class_weights = [1.0, 1.0, 2.0, 1.0, 1.0, 2.0, 2.0]
+augment = true
+mixed_precision = true
+early_stopping_patience = 10
+
+# Chemins optionnels si besoin d'override (sinon TrainingConfig utilise les defaults Cityscapes)
+# train_images = "data/downloads/P8_Cityscapes_leftImg8bit_trainvaltest/leftImg8bit/train"
+# train_masks  = "data/downloads/P8_Cityscapes_gtFine_trainvaltest/gtFine/train"
+# val_images   = "data/downloads/P8_Cityscapes_leftImg8bit_trainvaltest/leftImg8bit/val"
+# val_masks    = "data/downloads/P8_Cityscapes_gtFine_trainvaltest/gtFine/val"

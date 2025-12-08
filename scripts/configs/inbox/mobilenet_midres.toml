@@ -1,0 +1,20 @@
+# Preset mobilenet ce_dice, résolution demi-Cityscapes (512x1024) pour rester proche du ratio source.
+run_name = "mobilenet_ce_dice_midres"
+model_type = "mobilenetv2_deeplab_lite"
+input_height = 512
+input_width  = 1024
+batch_size = 4
+epochs = 40
+learning_rate = 0.0003
+loss_type = "ce_dice"
+class_weights = [1.0, 1.0, 2.0, 1.0, 1.0, 2.5, 2.5]
+augment = true
+fine_tune_from = 80
+mixed_precision = true
+early_stopping_patience = 8
+
+# Chemins optionnels si besoin d'override (sinon TrainingConfig utilise les defaults Cityscapes)
+# train_images = "data/downloads/P8_Cityscapes_leftImg8bit_trainvaltest/leftImg8bit/train"
+# train_masks  = "data/downloads/P8_Cityscapes_gtFine_trainvaltest/gtFine/train"
+# val_images   = "data/downloads/P8_Cityscapes_leftImg8bit_trainvaltest/leftImg8bit/val"
+# val_masks    = "data/downloads/P8_Cityscapes_gtFine_trainvaltest/gtFine/val"

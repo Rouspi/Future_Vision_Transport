@@ -1,0 +1,20 @@
+# Preset VGG16 U-Net, demi-Cityscapes (512x1024) pour garder le ratio source.
+run_name = "vgg16_unet_ce_dice"
+model_type = "vgg16_unet"
+input_height = 512
+input_width  = 1024
+batch_size = 2
+epochs = 35
+learning_rate = 0.0001
+loss_type = "ce_dice"
+class_weights = [1.0, 1.0, 2.0, 1.0, 1.0, 2.5, 2.5]
+augment = true
+fine_tune_from = 15
+mixed_precision = true
+early_stopping_patience = 6
+
+# Chemins optionnels si besoin d'override (sinon TrainingConfig utilise les defaults Cityscapes)
+# train_images = "data/downloads/P8_Cityscapes_leftImg8bit_trainvaltest/leftImg8bit/train"
+# train_masks  = "data/downloads/P8_Cityscapes_gtFine_trainvaltest/gtFine/train"
+# val_images   = "data/downloads/P8_Cityscapes_leftImg8bit_trainvaltest/leftImg8bit/val"
+# val_masks    = "data/downloads/P8_Cityscapes_gtFine_trainvaltest/gtFine/val"
