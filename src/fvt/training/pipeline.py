@@ -297,6 +297,7 @@ def train_segmentation_model(config: TrainingConfig, settings: Settings) -> tf.k
                 f"keras=={keras.__version__}",
                 "cloudpickle",
             ],
+            custom_objects={"DiceMetric": DiceMetric},
         )
 
     return history
