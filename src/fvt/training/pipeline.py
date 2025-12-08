@@ -287,6 +287,11 @@ def train_segmentation_model(config: TrainingConfig, settings: Settings) -> tf.k
             outputs=Schema([TensorSpec(np.dtype("float32"), (-1, config.input_height, config.input_width, config.num_classes))]),
         )
         example = np.zeros((1,) + config.input_shape(), dtype=np.float32)
+        loss_for_log = build_loss(config.loss_type, config.class_weights)
+        custom_objects = {"DiceMetric": DiceMetric}
+        # Ajoute la loss custom si nécessaire (weighted_cce, ce_dice, dice_loss)
+        if hasattr(loss_for_log, "__name__"):
+            custom_objects[loss_for_log.__name__] = loss_for_log
         mlflow.keras.log_model(
             model,
             artifact_path="model",
@@ -297,7 +302,7 @@ def train_segmentation_model(config: TrainingConfig, settings: Settings) -> tf.k
                 f"keras=={keras.__version__}",
                 "cloudpickle",
             ],
-            custom_objects={"DiceMetric": DiceMetric},
+            custom_objects=custom_objects,
         )
 
     return history
