@@ -5,6 +5,8 @@ from typing import Dict, Tuple
 import mlflow
 import mlflow.tensorflow
 import tensorflow as tf
+import keras
+import keras
 
 from fvt.config import Settings, ensure_directories
 from fvt.data.dataset_builder import build_dataset
@@ -258,7 +260,6 @@ def train_segmentation_model(config: TrainingConfig, settings: Settings) -> tf.k
 
     model = build_model(config)
 
-    mlflow.tensorflow.autolog(log_models=False)
     with mlflow.start_run(run_name=config.run_name):
         _log_static_metadata(config)
         history = model.fit(
@@ -279,10 +280,18 @@ def train_segmentation_model(config: TrainingConfig, settings: Settings) -> tf.k
 
         artifact_dir = settings.project_root / config.model_output_dir
         _save_artifacts(model, artifact_dir)
+        example = tf.zeros((1,) + config.input_shape(), dtype=tf.float32)
+        signature = mlflow.models.infer_signature(example.numpy(), model(example, training=False).numpy())
         mlflow.keras.log_model(
             model,
             artifact_path="model",
-            signature=None,
+            signature=signature,
+            input_example=example.numpy(),
+            pip_requirements=[
+                f"tensorflow=={tf.__version__}",
+                f"keras=={keras.__version__}",
+                "cloudpickle",
+            ],
         )
 
     return history
