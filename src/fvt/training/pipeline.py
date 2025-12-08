@@ -75,7 +75,8 @@ def _build_vgg16_unet(config: TrainingConfig) -> tf.keras.Model:
         base.get_layer("block3_conv3").output,
         base.get_layer("block4_conv3").output,
     ]
-    b = base.get_layer("block5_conv3").output
+    # Use the output after the final pooling to get a 1/32 stride feature map.
+    b = base.output
 
     # Decoder with skips
     x = tf.keras.layers.UpSampling2D((2, 2))(b)
