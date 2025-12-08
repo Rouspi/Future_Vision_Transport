@@ -288,17 +288,31 @@ def train_segmentation_model(config: TrainingConfig, settings: Settings) -> tf.k
         # Ajoute la loss custom si nécessaire (weighted_cce, ce_dice, dice_loss)
         if hasattr(loss_for_log, "__name__"):
             custom_objects[loss_for_log.__name__] = loss_for_log
-        mlflow.keras.log_model(
-            model,
-            artifact_path="model",
-            signature=signature,
-            input_example=example,
-            pip_requirements=[
-                f"tensorflow=={tf.__version__}",
-                f"keras=={keras.__version__}",
-                "cloudpickle",
-            ],
-            custom_objects=custom_objects,
-        )
+        try:
+            mlflow.keras.log_model(
+                model,
+                artifact_path="model",
+                signature=signature,
+                input_example=example,
+                pip_requirements=[
+                    f"tensorflow=={tf.__version__}",
+                    f"keras=={keras.__version__}",
+                    "cloudpickle",
+                ],
+                custom_objects=custom_objects,
+            )
+        except TypeError:
+            # Compatibilité MLflow sans support custom_objects (on log sans ces objets).
+            mlflow.keras.log_model(
+                model,
+                artifact_path="model",
+                signature=signature,
+                input_example=example,
+                pip_requirements=[
+                    f"tensorflow=={tf.__version__}",
+                    f"keras=={keras.__version__}",
+                    "cloudpickle",
+                ],
+            )
 
     return history
