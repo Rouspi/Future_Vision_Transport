@@ -280,13 +280,11 @@ def train_segmentation_model(config: TrainingConfig, settings: Settings) -> tf.k
 
         artifact_dir = settings.project_root / config.model_output_dir
         _save_artifacts(model, artifact_dir)
-        example = tf.zeros((1,) + config.input_shape(), dtype=tf.float32)
-        signature = mlflow.models.infer_signature(example.numpy(), model(example, training=False).numpy())
         mlflow.keras.log_model(
             model,
             artifact_path="model",
-            signature=signature,
-            input_example=example.numpy(),
+            signature=None,
+            input_example=None,
             pip_requirements=[
                 f"tensorflow=={tf.__version__}",
                 f"keras=={keras.__version__}",
