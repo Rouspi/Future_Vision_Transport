@@ -24,8 +24,8 @@ def load_segmenter(model_path: Path, cfg: TrainingConfig):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--image", required=True, help="Chemin image d'entrée (PNG/JPG)")
-    ap.add_argument("--model", default="artifacts/models/saved_model",
-                    help="SavedModel (dossier) ou checkpoint .weights.h5")
+    ap.add_argument("--model", default="artifacts/models/model.keras",
+                    help="Fichier .keras, SavedModel (dossier) ou checkpoint .weights.h5")
     ap.add_argument("--out", default="artifacts/pred_mask.png",
                     help="Chemin de sortie pour le mask colorisé")
     args = ap.parse_args()
@@ -39,4 +39,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

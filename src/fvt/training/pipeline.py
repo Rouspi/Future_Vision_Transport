@@ -183,8 +183,9 @@ def _log_static_metadata(config: TrainingConfig) -> None:
 
 def _save_artifacts(model: tf.keras.Model, artifact_dir: Path) -> Dict[str, str]:
     artifact_dir.mkdir(parents=True, exist_ok=True)
-    saved_model_dir = artifact_dir / "saved_model"
-    model.save(saved_model_dir, include_optimizer=False)
+    # Keras 3 impose une extension explicite : on sauvegarde au format natif .keras
+    saved_model_path = artifact_dir / "model.keras"
+    model.save(saved_model_path, include_optimizer=False)
 
     classes_path = artifact_dir / "classes.json"
     palette_path = artifact_dir / "palette.json"
@@ -197,7 +198,7 @@ def _save_artifacts(model: tf.keras.Model, artifact_dir: Path) -> Dict[str, str]
 
     mlflow.log_artifacts(str(artifact_dir), artifact_path="artifacts")
     return {
-        "saved_model": str(saved_model_dir),
+        "saved_model": str(saved_model_path),
         "classes": str(classes_path),
         "palette": str(palette_path),
     }

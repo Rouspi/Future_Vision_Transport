@@ -28,7 +28,7 @@ app = FastAPI(title="Future Vision Segmentation API", version="0.1.0")
 
 inference_cfg = InferenceConfig()
 MODEL_SOURCE = os.getenv("MODEL_SOURCE", "local")
-MODEL_PATH = Path(os.getenv("MODEL_PATH", settings.project_root / "artifacts" / "models" / "saved_model"))
+MODEL_PATH = Path(os.getenv("MODEL_PATH", settings.project_root / "artifacts" / "models" / "model.keras"))
 MODEL_NAME = os.getenv("MODEL_NAME", "future_vision_segmentation")
 MODEL_STAGE = os.getenv("MODEL_STAGE", "Production")
 

@@ -38,8 +38,8 @@ def main() -> None:
     ap.add_argument("--image", required=True, help="Chemin de l'image d'entrée (PNG/JPG).")
     ap.add_argument(
         "--model",
-        default="artifacts/models/saved_model",
-        help="Dossier SavedModel ou checkpoint .weights.h5",
+        default="artifacts/models/model.keras",
+        help="Fichier .keras (ou dossier SavedModel / checkpoint .weights.h5)",
     )
     ap.add_argument(
         "--out",
