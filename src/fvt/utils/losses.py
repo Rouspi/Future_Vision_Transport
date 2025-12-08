@@ -5,6 +5,9 @@ import tensorflow as tf
 
 def dice_coefficient(y_true: tf.Tensor, y_pred: tf.Tensor, smooth: float = 1e-6) -> tf.Tensor:
     """Dice coefficient moyen sur les classes (y_true/y_pred one-hot)."""
+    # Force les calculs en float32 pour éviter les conflits de dtype en mixed_precision.
+    y_true = tf.cast(y_true, tf.float32)
+    y_pred = tf.cast(y_pred, tf.float32)
     y_true_f = tf.reshape(y_true, (tf.shape(y_true)[0], -1, tf.shape(y_true)[-1]))
     y_pred_f = tf.reshape(y_pred, (tf.shape(y_pred)[0], -1, tf.shape(y_pred)[-1]))
     intersection = tf.reduce_sum(y_true_f * y_pred_f, axis=1)
@@ -32,6 +35,9 @@ def build_loss(loss_type: str, class_weights: Optional[Tuple[float, ...]] = None
     """Factory for losses: weighted CE, Dice, or CE+Dice."""
 
     def weighted_cce(y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
+        # Force le calcul en float32 pour éviter les conflits de dtype (ex: float16 en mixed_precision).
+        y_true = tf.cast(y_true, tf.float32)
+        y_pred = tf.cast(y_pred, tf.float32)
         if class_weights:
             class_w = tf.constant(class_weights, dtype=tf.float32)
             weights = tf.reduce_sum(class_w * y_true, axis=-1)
