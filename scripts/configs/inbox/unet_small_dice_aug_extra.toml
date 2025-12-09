@@ -1,0 +1,15 @@
+# UNet mini, loss Dice, augmentation activée. Dimensions 512x1024 (X et y identiques).
+run_name = "unet_small_dice_aug_extra"
+model_type = "unet_small"
+input_height = 512
+input_width  = 1024
+batch_size = 2
+epochs = 30
+learning_rate = 0.0002
+loss_type = "dice"
+class_weights = [1.0, 1.0, 2.0, 1.0, 1.0, 2.0, 2.0]
+augment = true
+mixed_precision = true
+early_stopping_patience = 10
+# Top-K checkpoints : None = tous, sinon K meilleurs val_miou
+top_k_checkpoints = 3

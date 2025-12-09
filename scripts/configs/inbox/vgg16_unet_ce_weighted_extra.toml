@@ -1,0 +1,15 @@
+# VGG16 UNet, CE pondérée (balanced cross-entropy), augmentation activée. Batch réduit pour la VRAM.
+run_name = "vgg16_unet_ce_weighted_extra"
+model_type = "vgg16_unet"
+input_height = 512
+input_width  = 1024
+batch_size = 1
+epochs = 25
+learning_rate = 0.0001
+loss_type = "ce_weighted"
+class_weights = [1.0, 1.0, 2.0, 1.0, 1.0, 2.5, 2.5]
+augment = true
+fine_tune_from = 15
+mixed_precision = true
+early_stopping_patience = 6
+top_k_checkpoints = 3
