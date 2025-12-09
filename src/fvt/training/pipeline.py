@@ -283,7 +283,6 @@ def train_segmentation_model(config: TrainingConfig, settings: Settings) -> tf.k
             inputs=Schema([TensorSpec(np.dtype("float32"), (-1,) + config.input_shape())]),
             outputs=Schema([TensorSpec(np.dtype("float32"), (-1, config.input_height, config.input_width, config.num_classes))]),
         )
-        example = np.zeros((1,) + config.input_shape(), dtype=np.float32)
         loss_for_log = build_loss(config.loss_type, config.class_weights)
         custom_objects = {"DiceMetric": DiceMetric}
         # Ajoute la loss custom si nécessaire (weighted_cce, ce_dice, dice_loss)
@@ -294,7 +293,6 @@ def train_segmentation_model(config: TrainingConfig, settings: Settings) -> tf.k
                 model,
                 artifact_path="model",
                 signature=signature,
-                input_example=example,
                 pip_requirements=[
                     f"tensorflow=={tf.__version__}",
                     f"keras=={keras.__version__}",
