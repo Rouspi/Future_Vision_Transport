@@ -17,6 +17,7 @@ from fvt.training.config import TrainingConfig
 from fvt.utils.losses import DiceMetric, build_loss
 from fvt.utils.models import build_model
 from fvt.utils.losses import DiceMetric, build_loss
+from tensorflow.keras.callbacks import Callback
 
 
 def _build_backbone(input_shape: Tuple[int, int, int], trainable: bool = True) -> tf.keras.Model:
@@ -106,6 +107,44 @@ def _build_vgg16_unet(config: TrainingConfig) -> tf.keras.Model:
     outputs = tf.keras.layers.Conv2D(config.num_classes, 1, activation="softmax")(x)
     model = tf.keras.Model(inputs=inputs, outputs=outputs, name="vgg16_unet")
     return model
+
+
+class TopKCheckpoints(Callback):
+    """Garde tous les checkpoints si k=None, sinon les top-k sur le metric monitor."""
+
+    def __init__(self, filepath_pattern: Path, monitor: str = "val_miou", mode: str = "max", k: Optional[int] = None):
+        super().__init__()
+        self.filepath_pattern = Path(filepath_pattern)
+        self.monitor = monitor
+        self.mode = mode
+        self.k = k
+        self.top: list[tuple[float, Path]] = []
+        self.best_path: Optional[Path] = None
+
+    def _better(self, a: float, b: float) -> bool:
+        return a > b if self.mode == "max" else a < b
+
+    def on_epoch_end(self, epoch, logs=None):
+        logs = logs or {}
+        if self.monitor not in logs:
+            return
+        metric = float(logs[self.monitor])
+        path = Path(str(self.filepath_pattern).format(epoch=epoch, **{self.monitor: metric}))
+        path.parent.mkdir(parents=True, exist_ok=True)
+        self.model.save_weights(path)
+        self.top.append((metric, path))
+        # Trie par metric
+        self.top.sort(key=lambda x: x[0], reverse=(self.mode == "max"))
+        # Best path
+        self.best_path = self.top[0][1]
+        # Trim top-k si demandé
+        if self.k is not None and len(self.top) > self.k:
+            for _, p in self.top[self.k:]:
+                try:
+                    p.unlink(missing_ok=True)
+                except Exception:
+                    pass
+            self.top = self.top[: self.k]
 
 
 def build_model(config: TrainingConfig) -> tf.keras.Model:
@@ -234,9 +273,16 @@ def train_segmentation_model(config: TrainingConfig, settings: Settings) -> tf.k
     mlflow.set_tracking_uri(settings.mlflow_tracking_uri)
     mlflow.set_experiment(config.experiment_name or settings.mlflow_experiment)
 
-    ckpt_dir = settings.project_root / config.checkpoint_dir
+    run_suffix = config.run_name or "run"
+    ckpt_dir = (settings.project_root / config.checkpoint_dir / run_suffix).resolve()
     ckpt_dir.mkdir(parents=True, exist_ok=True)
-    ckpt_pattern = ckpt_dir / f"{config.run_name or 'run'}-{{epoch:02d}}-{{val_miou:.3f}}.weights.h5"
+    ckpt_pattern = ckpt_dir / f"{run_suffix}-{{epoch:02d}}-{{val_miou:.3f}}.weights.h5"
+    ckpt_callback = TopKCheckpoints(
+        filepath_pattern=ckpt_pattern,
+        monitor="val_miou",
+        mode="max",
+        k=config.top_k_checkpoints,
+    )
 
     callbacks = [
         tf.keras.callbacks.EarlyStopping(
@@ -246,14 +292,7 @@ def train_segmentation_model(config: TrainingConfig, settings: Settings) -> tf.k
             restore_best_weights=True,
         ),
         tf.keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=2, verbose=1),
-        tf.keras.callbacks.ModelCheckpoint(
-            filepath=str(ckpt_pattern),
-            monitor="val_miou",
-            mode="max",
-            save_best_only=True,
-            save_weights_only=True,
-            verbose=1,
-        ),
+        ckpt_callback,
     ]
 
     model = build_model(config)
@@ -277,7 +316,15 @@ def train_segmentation_model(config: TrainingConfig, settings: Settings) -> tf.k
                 except Exception:
                     pass
 
-        artifact_dir = settings.project_root / config.model_output_dir
+        # Recharge le meilleur checkpoint val_miou si disponible.
+        best_ckpt = ckpt_callback.best_path
+        if best_ckpt and best_ckpt.exists():
+            try:
+                model.load_weights(str(best_ckpt))
+            except Exception:
+                pass
+
+        artifact_dir = (settings.project_root / config.model_output_dir / run_suffix).resolve()
         _save_artifacts(model, artifact_dir)
         signature = ModelSignature(
             inputs=Schema([TensorSpec(np.dtype("float32"), (-1,) + config.input_shape())]),
@@ -306,12 +353,17 @@ def train_segmentation_model(config: TrainingConfig, settings: Settings) -> tf.k
                 model,
                 artifact_path="model",
                 signature=signature,
-                input_example=example,
                 pip_requirements=[
                     f"tensorflow=={tf.__version__}",
                     f"keras=={keras.__version__}",
                     "cloudpickle",
                 ],
             )
+
+        # Log des checkpoints dans MLflow (tous ou top-k selon config.top_k_checkpoints).
+        try:
+            mlflow.log_artifacts(str(ckpt_dir), artifact_path="checkpoints")
+        except Exception:
+            pass
 
     return history

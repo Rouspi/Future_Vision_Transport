@@ -43,5 +43,8 @@ class TrainingConfig:
     val_images: Path = Path("data/downloads/P8_Cityscapes_leftImg8bit_trainvaltest/leftImg8bit/val")
     val_masks: Path = Path("data/downloads/P8_Cityscapes_gtFine_trainvaltest/gtFine/val")
 
+    # Checkpoints : None => on garde tous les checkpoints, sinon on garde les top-K val_miou.
+    top_k_checkpoints: Optional[int] = None
+
     def input_shape(self) -> Tuple[int, int, int]:
         return (self.input_height, self.input_width, 3)
