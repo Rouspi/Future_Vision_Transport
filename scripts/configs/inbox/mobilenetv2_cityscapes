@@ -1,15 +1,32 @@
+[training]
 run_name = "mobilenetv2_cityscapes"
-model_type = "mobilenetv2_deeplab_lite"
-input_height = 512
-input_width  = 1024
-batch_size   = 1
-epochs       = 30
-learning_rate = 0.0001
-loss_type = "ce_weighted" 
-class_weights = [1.0, 1.0, 1.5, 1.0, 1.0, 2.0, 2.0]
+
+data_dir      = "data/downloads"
+train_split   = "train"
+val_split     = "val"
+
+height = 512
+width  = 1024
+batch_size = 2
+epochs = 20
+learning_rate = 1e-4
 augment = true
-fine_tune_from = null
-mixed_precision = true
-early_stopping_patience = 20
-top_k_checkpoints = 3
+mixed_precision = false
+
+# Modèle et loss
+model_type = "mobilenetv2_deeplab_lite"
+loss_type  = "ce_weighted"
+
+# Poids de classes (7 classes)
+class_weights = [1.0, 1.0, 1.5, 1.0, 1.0, 2.0, 2.0]
+
+# Checkpoints : None => on garde tous les ckpts, k => Top-K
+top_k_checkpoints = null
+
+# Répertoires artefacts (le code ajoute automatiquement le suffixe run_name)
+model_output_dir = "artifacts/models"
+checkpoint_dir   = "artifacts/checkpoints"
+
+# Suivi MLflow
+mlflow_experiment = "cityscapes"
 
