@@ -1,0 +1,22 @@
+[training]
+run_name = "mobilenetv2_cityscapes"
+experiment_name = "cityscapes"
+
+input_height = 512
+input_width  = 1024
+batch_size   = 2
+epochs       = 20
+learning_rate = 1e-4
+augment = true
+mixed_precision = false
+
+model_type = "mobilenetv2_deeplab_lite"
+loss_type  = "ce_weighted"
+
+# Poids de classes (7 classes)
+class_weights = [1.0, 1.0, 1.5, 1.0, 1.0, 2.0, 2.0]
+
+# Si tu veux garder tous les checkpoints, laisse la ligne suivante absente.
+# Pour ne conserver que les k meilleurs, ajoute par ex.:
+# top_k_checkpoints = 3
+
