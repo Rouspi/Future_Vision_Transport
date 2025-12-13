@@ -1,0 +1,35 @@
+run_name = "mobilenetv2_cityscapes"
+model_type = "mobilenetv2_deeplab_lite"
+
+# Données (Cityscapes)
+train_images = "data/downloads/P8_Cityscapes_leftImg8bit_trainvaltest/leftImg8bit/train"
+train_masks  = "data/downloads/P8_Cityscapes_gtFine_trainvaltest/gtFine/train"
+val_images   = "data/downloads/P8_Cityscapes_leftImg8bit_trainvaltest/leftImg8bit/val"
+val_masks    = "data/downloads/P8_Cityscapes_gtFine_trainvaltest/gtFine/val"
+
+# Entrée/sortie (X et y ont la même taille)
+input_height = 512
+input_width  = 1024
+num_classes  = 7
+batch_size   = 2
+epochs       = 30
+learning_rate = 0.0001
+weight_decay  = 0.00001
+
+# Loss / pondération
+loss_type = "ce_weighted"  # balanced cross-entropy
+class_weights = [1.0, 1.0, 1.5, 1.0, 1.0, 2.0, 2.0]
+
+# Entraînement
+augment = true
+mixed_precision = false
+fine_tune_from = null
+early_stopping_patience = 20
+steps_per_epoch = null
+validation_steps = null
+
+# Artefacts
+#model_output_dir = "artifacts/models"
+#checkpoint_dir   = "artifacts/checkpoints"
+top_k_checkpoints = null  # tous les checkpoints
+
