@@ -2,4 +2,5 @@ fastapi
 uvicorn[standard]
 pillow
 numpy
-tensorflow==2.16.2   
+tensorflow==2.16.2  
+pytest 
