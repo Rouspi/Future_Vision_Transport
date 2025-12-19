@@ -8,7 +8,7 @@ DEFAULT_EXPERIMENT_NAME = "future_vision_segmentation"
 
 @dataclass
 class Settings:
-    """Container for project-wide paths and MLflow configuration."""
+    """Conteneur pour les chemins du projet et la configuration MLflow."""
 
     project_root: Path
     data_root: Path
@@ -26,10 +26,10 @@ def load_settings() -> Settings:
     data_root = repo_root / "data"
 
     mlruns_dir = repo_root / "mlruns"
-    # Default to external MLflow server if provided; fallback to local file-based backend.
+    # Par défaut, on utilise un serveur MLflow externe s'il est fourni ; sinon on bascule sur le backend local sur disque.
     tracking_uri = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000")
     if tracking_uri == "http://localhost:5000" and not os.getenv("MLFLOW_TRACKING_URI"):
-        # If the local server is not reachable, MLflow will transparently create the dir backend.
+        # Si le serveur local est inaccessible, MLflow créera automatiquement le backend sur disque.
         tracking_uri = os.getenv("MLFLOW_FALLBACK_URI", str(mlruns_dir))
     experiment = os.getenv("MLFLOW_EXPERIMENT", DEFAULT_EXPERIMENT_NAME)
 

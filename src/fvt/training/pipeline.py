@@ -50,7 +50,7 @@ def _build_unet_small(config: TrainingConfig) -> tf.keras.Model:
     b = tf.keras.layers.Conv2D(256, 3, activation="relu", padding="same")(p3)
     b = tf.keras.layers.Conv2D(256, 3, activation="relu", padding="same")(b)
 
-    # Decoder
+    # Décodeur
     u3 = tf.keras.layers.UpSampling2D((2, 2))(b)
     u3 = tf.keras.layers.Concatenate()([u3, c3])
     c4 = tf.keras.layers.Conv2D(128, 3, activation="relu", padding="same")(u3)
@@ -83,7 +83,7 @@ def _build_vgg16_unet(config: TrainingConfig) -> tf.keras.Model:
     # Utilise le bottleneck avant le dernier pooling (block5_conv3) pour garder un stride 1/16.
     b = base.get_layer("block5_conv3").output
 
-    # Decoder with skips
+    # Décodeur avec skips
     x = tf.keras.layers.UpSampling2D((2, 2))(b)
     x = tf.keras.layers.Concatenate()([x, skips[-1]])
     x = tf.keras.layers.Conv2D(512, 3, activation="relu", padding="same")(x)
@@ -135,9 +135,9 @@ class TopKCheckpoints(Callback):
         self.top.append((metric, path))
         # Trie par metric
         self.top.sort(key=lambda x: x[0], reverse=(self.mode == "max"))
-        # Best path
+        # Chemin du meilleur checkpoint
         self.best_path = self.top[0][1]
-        # Trim top-k si demandé
+        # Coupe la liste au top-k si demandé
         if self.k is not None and len(self.top) > self.k:
             for _, p in self.top[self.k:]:
                 try:
@@ -188,7 +188,7 @@ def build_model(config: TrainingConfig) -> tf.keras.Model:
         DiceMetric(name="dice"),
     ]
 
-    # We pass sample_weight to ignore void pixels; metrics are unweighted.
+    # On passe sample_weight pour ignorer les pixels void ; les métriques restent non pondérées.
     model.compile(
         optimizer=optimizer,
         loss=loss,
@@ -308,7 +308,7 @@ def train_segmentation_model(config: TrainingConfig, settings: Settings) -> tf.k
             steps_per_epoch=config.steps_per_epoch,
             validation_steps=config.validation_steps,
         )
-        # Log metrics manually to ensure miou/val_miou/dice are tracked
+        # Log des métriques manuellement pour s'assurer que miou/val_miou/dice sont suivies
         for k, values in history.history.items():
             for step, v in enumerate(values):
                 try:

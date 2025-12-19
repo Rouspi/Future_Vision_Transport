@@ -1,1 +1,1 @@
-# Utility package for shared losses/metrics/models/training aliases.
+# Package utilitaire pour les pertes/mesures/modèles/alias de training partagés.
