@@ -24,7 +24,8 @@ class InferenceConfig:
 
 
 def load_model(model_path: Path) -> tf.keras.Model:
-    return tf.keras.models.load_model(model_path)
+    # compile=False pour éviter d'exiger les métriques/objets custom (ex. DiceMetric) à l'inférence.
+    return tf.keras.models.load_model(model_path, compile=False)
 
 
 def preprocess_image(image_path: Path, target_size: Tuple[int, int]) -> tf.Tensor:
