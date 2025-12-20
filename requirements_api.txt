@@ -6,4 +6,5 @@ numpy
 tensorflow-cpu==2.16.2
 pytest
 httpx
-mlflow 
+mlflow
+python-multipart 
