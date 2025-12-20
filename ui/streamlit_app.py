@@ -90,9 +90,9 @@ def main() -> None:
         find_cityscapes_mask(image_path, image_dir, mask_dir) if mask_dir.exists() else None
     )
 
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3 = st.columns(3, gap="large")
     with col1:
-        st.image(Image.open(image_path), caption="Image", width=320)
+        st.image(Image.open(image_path), caption="Image", width=300)
     if mask_path and mask_path.exists():
         with col2:
             mask_arr = np.array(Image.open(mask_path))
@@ -102,7 +102,7 @@ def main() -> None:
                     mask_arr = label_ids_to_train_ids(mask_arr)
                 mask_arr = remap_train_ids_to_categories(mask_arr)
                 mask_arr = colorize(mask_arr)
-            st.image(mask_arr, caption="Mask réel", width=320)
+            st.image(mask_arr, caption="Mask réel", width=300)
 
     if st.button("Lancer la prédiction"):
         with image_path.open("rb") as f:
@@ -121,7 +121,7 @@ def main() -> None:
         mask_img = decode_mask(payload["mask_base64"])
 
         with col3:
-            st.image(mask_img, caption="Mask prédit", width=320)
+            st.image(mask_img, caption="Mask prédit", width=300)
 
         st.json(
             {
