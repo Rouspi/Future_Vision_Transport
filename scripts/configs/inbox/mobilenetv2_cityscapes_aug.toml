@@ -1,4 +1,4 @@
-run_name = "mobilenetv2_cityscapes"
+run_name = "mobilenetv2_cityscapes_aug"
 experiment_name = "cityscapes"
 
 input_height = 512
@@ -6,7 +6,7 @@ input_width  = 1024
 batch_size   = 2
 epochs       = 20
 learning_rate = 1e-4
-augment = false
+augment = true
 mixed_precision = false
 
 model_type = "mobilenetv2_deeplab_lite"
