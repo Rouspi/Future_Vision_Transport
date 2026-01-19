@@ -72,7 +72,39 @@ def _augment(image: tf.Tensor, mask: tf.Tensor) -> Tuple[tf.Tensor, tf.Tensor]:
     mask_3d = mask[..., tf.newaxis]
     mask_3d = tf.cond(flip, lambda: tf.image.flip_left_right(mask_3d), lambda: mask_3d)
     mask = tf.squeeze(mask_3d, axis=-1)
+    image = _random_blur(image)
+    image = _add_rain(image)
     return image, mask
+
+
+def _random_blur(image: tf.Tensor, prob: float = 0.3) -> tf.Tensor:
+    apply = tf.random.uniform(()) < prob
+
+    def _blur() -> tf.Tensor:
+        # Simple box blur.
+        blurred = tf.nn.avg_pool(image[tf.newaxis, ...], ksize=3, strides=1, padding="SAME")
+        return tf.squeeze(blurred, axis=0)
+
+    return tf.cond(apply, _blur, lambda: image)
+
+
+def _add_rain(image: tf.Tensor, prob: float = 0.3) -> tf.Tensor:
+    apply = tf.random.uniform(()) < prob
+
+    def _rain() -> tf.Tensor:
+        height = tf.shape(image)[0]
+        width = tf.shape(image)[1]
+        # Sparse streak seeds.
+        seeds = tf.random.uniform((height, width, 1), 0.0, 1.0)
+        streaks = tf.cast(seeds > 0.97, tf.float32)
+        # Stretch streaks vertically.
+        streaks = tf.nn.avg_pool(streaks[tf.newaxis, ...], ksize=[1, 9, 1, 1], strides=1, padding="SAME")
+        streaks = tf.squeeze(streaks, axis=0)
+        intensity = 0.35
+        rainy = tf.clip_by_value(image + streaks * intensity, 0.0, 1.0)
+        return rainy
+
+    return tf.cond(apply, _rain, lambda: image)
 
 
 def _preprocess(
